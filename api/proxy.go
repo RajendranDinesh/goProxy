@@ -8,15 +8,24 @@ import (
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	URL := r.URL.Query().Get("url")
 	if URL == "" {
 		http.Error(w, "Missing URL parameter", http.StatusBadRequest)
 		return
 	}
 
-	parsedURL, err := url.Parse(URL)
+	parsedURL, err := url.Parse(URL + "&client=chrome")
 	if err != nil {
-		http.Error(w, "Error fetching data", http.StatusInternalServerError)
+		http.Error(w, "Error parsing url", http.StatusInternalServerError)
 		return
 	}
 
